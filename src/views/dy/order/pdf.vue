@@ -15,7 +15,9 @@
             <h1 style="font-weight: 700">{{ dept.deptName }}托运单</h1>
           </div>
         </th>
-        <th colspan="2" style="text-align: left">总件数：{{ order.total }}</th>
+        <th colspan="2" style="text-align: left; font-size: 24px">
+          总件数：{{ order.total }}
+        </th>
       </tr>
       <tr>
         <td colspan="12" style="text-align: center">

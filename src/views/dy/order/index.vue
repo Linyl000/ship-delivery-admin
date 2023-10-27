@@ -609,7 +609,14 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="装柜状态" align="center" prop="boxType" />
+      <el-table-column label="装柜状态" align="center" prop="boxStatus">
+        <template slot-scope="scope">
+          <dict-tag
+            :options="dict.type.order_box_status"
+            :value="scope.row.boxStatus"
+          />
+        </template>
+      </el-table-column>
       <!-- <el-table-column label="订单状态" align="center" prop="status">
         <template slot-scope="scope">
           <dict-tag
@@ -941,7 +948,8 @@ export default {
     'dy_transport_type',
     'payment_status',
     'dy_payment_method',
-    'dy_order_status'
+    'dy_order_status',
+    'order_box_status'
   ],
   components: { OderDt, Box },
   data() {

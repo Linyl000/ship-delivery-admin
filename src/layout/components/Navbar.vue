@@ -119,12 +119,13 @@ export default {
     }
   },
   created() {
-    this.getInfo
+    this.getInfo()
   },
   methods: {
     getInfo() {
       getInfo().then((res) => {
         this.kfBarcodeUrl = res.kfBarcodeUrl
+        console.log(this.kfBarcodeUrl)
       })
     },
     toggleSideBar() {

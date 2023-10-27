@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 style="text-align: center">万海供应链</h1>
+    <h1 style="text-align: center">Wan Hai international</h1>
     <!-- <div v-if="list.length !== 0" style="text-align: center; color: #666">
       运单号：{{ list[0].logisticsId }}
     </div> -->

@@ -71,8 +71,8 @@
           plain
           icon="el-icon-s-ticket"
           size="mini"
-          :disabled="single3"
-          @click="goPrintTab"
+          :disabled="false"
+          @click="showTabSelect"
           v-hasPermi="['dy:box:edit']"
           >打印标签</el-button
         >
@@ -159,14 +159,14 @@
             v-hasPermi="['dy:box:remove']"
             >删除</el-button
           >
-          <el-button
+          <!-- <el-button
             size="mini"
             type="text"
             icon="el-icon-s-ticket"
             @click="goPrintTab(scope.row)"
             v-hasPermi="['dy:box:edit']"
             >打印标签</el-button
-          >
+          > -->
         </template>
       </el-table-column>
     </el-table>
@@ -278,6 +278,29 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+    <!-- 选择 -->
+    <el-dialog
+      :title="'批量打印标签'"
+      :visible.sync="openTabSelect"
+      width="500px"
+      append-to-body
+    >
+      <el-form ref="form2" :model="form3" :rules="rules3" label-width="110px">
+        <el-form-item label="总数" prop="tatalBox">
+          <el-input v-model="form3.tatalBox" placeholder="请输入总数" />
+        </el-form-item>
+        <el-form-item label="开始序号" prop="startNumer">
+          <el-input v-model="form3.startNumer" placeholder="请输入总数" />
+        </el-form-item>
+        <el-form-item label="结束序号" prop="endNumer">
+          <el-input v-model="form3.endNumer" placeholder="请输入总数" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="goPrintTab">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -296,6 +319,7 @@ export default {
   name: 'Box',
   data() {
     return {
+      openTabSelect: null,
       // 遮罩层
       loading: true,
       // 选中数组
@@ -336,6 +360,7 @@ export default {
       },
       // 表单参数
       form: {},
+      form3: {},
       teacherList: [],
       // 表单校验
       rules: {
@@ -383,6 +408,17 @@ export default {
           { required: true, message: '物流信息状态不能为空', trigger: 'change' }
         ]
       },
+      rules3: {
+        tatalBox: [
+          { required: true, message: '总数不能为空', trigger: 'blur' }
+        ],
+        startNumer: [
+          { required: true, message: '开始序号不能为空', trigger: 'blur' }
+        ],
+        endNumer: [
+          { required: true, message: '结束序号不能为空', trigger: 'change' }
+        ]
+      },
       len: null
     }
   },
@@ -425,6 +461,7 @@ export default {
     cancel() {
       this.open = false
       this.open2 = false
+      this.openTabSelect = false
       this.reset()
     },
     // 表单重置
@@ -544,14 +581,25 @@ export default {
         })
         .catch(() => {})
     },
-    goPrintTab(row) {
+    showTabSelect() {
+      this.form3 = {}
+      this.openTabSelect = true
+    },
+    goPrintTab() {
+      if (this.form3.endNumer < this.form3.startNumer) {
+        this.$message.error('开始序列不能大于结束序列！')
+        return
+      }
       const routeData = this.$router.resolve({
         path: '/printTab',
         query: {
           orderId: this.orderId,
-          ids: JSON.stringify(row.id) || JSON.stringify(this.ids)
+          tatalBox: this.form3.tatalBox,
+          startNumer: this.form3.startNumer,
+          endNumer: this.form3.endNumer
         }
       })
+      this.openTabSelect = false
       const url = routeData.href
       window.open(url, '_blank')
     },

@@ -8,7 +8,11 @@
       v-show="showSearch"
       label-width="68px"
     >
-      <el-form-item label="客户ID" prop="userId">
+      <el-form-item
+        label="客户ID"
+        prop="userId"
+        v-if="roleKey == 'admin' || roleKey == 'admin1'"
+      >
         <el-input
           v-model="queryParams.userId"
           placeholder="请输入客户ID"
@@ -56,15 +60,11 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="成本" prop="cost">
-        <el-input
-          v-model="queryParams.cost"
-          placeholder="请输入成本"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="利润" prop="profit">
+      <el-form-item
+        label="利润"
+        prop="profit"
+        v-if="roleKey == 'admin' || roleKey == 'admin1'"
+      >
         <el-input
           v-model="queryParams.profit"
           placeholder="请输入利润"
@@ -149,6 +149,7 @@
     </el-row>
 
     <el-table
+      v-if="roleKey == 'admin' || roleKey == 'admin1'"
       v-loading="loading"
       :data="financeList"
       @selection-change="handleSelectionChange"
@@ -174,7 +175,9 @@
         align="center"
         prop="totalAmountPHP"
       />
-      <el-table-column label="成本" align="center" prop="cost" />
+      <el-table-column label="报关成本" align="center" prop="bgCost" />
+      <el-table-column label="清关成本" align="center" prop="qgCost" />
+      <el-table-column label="派送成本" align="center" prop="psCost" />
       <el-table-column label="利润" align="center" prop="profit" />
       <el-table-column
         label="支付时间"
@@ -211,7 +214,58 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-table
+      v-else
+      v-loading="loading"
+      :data="financeList"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column label="订单ID" align="center" prop="orderId" />
+      <el-table-column
+        label="货柜时间"
+        align="center"
+        prop="createTime"
+        width="180"
+      >
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="计费体积/重量" align="center" prop="finVolume" />
+      <el-table-column label="计费单价" align="center" prop="finDj" />
 
+      <el-table-column label="费用合计(RMB)" align="center" prop="totalRMB" />
+      <el-table-column label="费用合计(PHP)" align="center" prop="totalPHP" />
+      <el-table-column label="付款状态" align="center" prop="paymentStatus">
+        <template slot-scope="scope">
+          <dict-tag
+            :options="dict.type.payment_status"
+            :value="scope.row.paymentStatus"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="付款时间"
+        align="center"
+        prop="paymentTime"
+        width="180"
+      >
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.paymentTime, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="已付金额(RMB)"
+        align="center"
+        prop="totalAmount"
+      />
+      <el-table-column
+        label="已付金额(PHP)"
+        align="center"
+        prop="totalAmountPHP"
+      />
+    </el-table>
     <pagination
       v-show="total > 0"
       :total="total"
@@ -303,10 +357,30 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="成本" prop="cost">
+            <el-form-item label="报关成本" prop="bgCost">
               <el-input
-                v-model="form.cost"
-                placeholder="请输入成本"
+                v-model="form.bgCost"
+                placeholder="请输入报关成本"
+                maxlength="50"
+              ></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="清关成本" prop="qgCost">
+              <el-input
+                v-model="form.qgCost"
+                placeholder="请输入清关成本"
+                maxlength="50"
+              ></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="派送成本" prop="psCost">
+              <el-input
+                v-model="form.psCost"
+                placeholder="请输入派送成本"
                 maxlength="50"
               ></el-input>
             </el-form-item>
@@ -417,7 +491,8 @@ export default {
       // 表单参数
       form: {},
       // 表单校验
-      rules: {}
+      rules: {},
+      roleKey: null
     }
   },
   watch: {
@@ -432,6 +507,7 @@ export default {
   },
   created() {
     this.getList()
+    this.roleKey = localStorage.getItem('roleKey')
   },
   methods: {
     /** 查询财务表列表 */
@@ -461,7 +537,9 @@ export default {
         orderTime: null,
         finishTime: null,
         totalAmount: null,
-        cost: null,
+        psCost: null,
+        bgCost: null,
+        qgCost: null,
         profit: null,
         createTime: null,
         updateTime: null

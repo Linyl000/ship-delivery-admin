@@ -23,19 +23,27 @@ export default {
       // 查询参数
       queryParams: {
         ids: null,
-        orderId: null
+        orderId: null,
+        tatalBox: null,
+        startNumer: null,
+        endNumer: null
       }
     }
   },
   created() {
-    this.queryParams.ids = JSON.parse(this.$route.query.ids)
-    this.queryParams.orderId = JSON.parse(this.$route.query.orderId)
+    // this.queryParams.ids = JSON.parse(this.$route.query.ids)
+    this.queryParams.orderId = this.$route.query.orderId
+    this.queryParams.tatalBox = this.$route.query.tatalBox
+    this.queryParams.startNumer = this.$route.query.startNumer
+    this.queryParams.endNumer = this.$route.query.endNumer
     this.getList()
   },
   methods: {
     getList() {
+      console.log(this.queryParams)
       seq(this.queryParams).then((response) => {
         this.list = response.data
+        console.log(response.data)
       })
     }
   }
