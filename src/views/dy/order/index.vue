@@ -282,16 +282,17 @@
           >删除</el-button
         >
       </el-col>
-      <!--      <el-col :span="1.5">
+      <el-col :span="1.5">
         <el-button
           type="warning"
           plain
           icon="el-icon-download"
           size="mini"
-          @click="handleExport"
+          @click="handleExport1"
           v-hasPermi="['dy:order:export']"
-        >导出</el-button>
-      </el-col> -->
+          >导出</el-button
+        >
+      </el-col>
       <right-toolbar
         :showSearch.sync="showSearch"
         @queryTable="getList"
@@ -1229,6 +1230,16 @@ export default {
       })
       const url = routeData.href
       window.open(url, '_blank')
+    },
+    /** 导出按钮操作 */
+    handleExport1() {
+      this.download(
+        'dy/order/export',
+        {
+          ...this.queryParams
+        },
+        `order_${new Date().getTime()}.xlsx`
+      )
     }
   }
 }
