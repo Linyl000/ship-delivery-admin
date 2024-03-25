@@ -1,44 +1,59 @@
-import request from '@/utils/request'
+import request from "@/utils/request";
 
 // 查询用户账单列表
 export function listPayorder(query) {
   return request({
-    url: '/payorder/list',
-    method: 'get',
-    params: query
-  })
+    url: "/payorder/list",
+    method: "get",
+    params: query,
+  });
 }
 
 // 查询用户账单详细
-export function getPayorder(id) { 
+export function getPayorder(id) {
   return request({
-    url: '/payorder/' + id,
-    method: 'get'
-  })
+    url: "/payorder/" + id,
+    method: "get",
+  });
 }
 
 // 新增用户账单
 export function addPayorder(data) {
   return request({
-    url: '/payorder',
-    method: 'post',
-    data: data
-  })
+    url: "/payorder",
+    method: "post",
+    data: data,
+  });
 }
 
 // 修改用户账单
 export function updatePayorder(data) {
   return request({
-    url: '/payorder',
-    method: 'put',
-    data: data
-  })
+    url: "/payorder",
+    method: "put",
+    data: data,
+  });
 }
 
 // 删除用户账单
 export function delPayorder(id) {
   return request({
-    url: '/payorder/' + id,
-    method: 'delete'
-  })
+    url: "/payorder/" + id,
+    method: "delete",
+  });
+}
+
+//订单预创建
+export function precreatePayorder(id) {
+  return request({
+    url: "/payorder/precreate/" + id,
+    method: "get",
+  });
+}
+//支付宝
+export function payZfb(id) {
+  return request({
+    url: "/aliPay/tradePreCreatePay/" + id,
+    method: "get",
+  });
 }
