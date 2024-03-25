@@ -165,7 +165,7 @@
         width="180"
       >
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.orderTime, "{y}-{m}-{d}") }}</span>
+          <span>{{ parseTime(scope.row.orderTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
 
@@ -186,7 +186,7 @@
         width="180"
       >
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.paymentTime, "{y}-{m}-{d}") }}</span>
+          <span>{{ parseTime(scope.row.paymentTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -236,7 +236,7 @@
         width="180"
       >
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime, "{y}-{m}-{d}") }}</span>
+          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="计费体积/重量" align="center" prop="finVolume" />
@@ -259,7 +259,7 @@
         width="180"
       >
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.paymentTime, "{y}-{m}-{d}") }}</span>
+          <span>{{ parseTime(scope.row.paymentTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -474,16 +474,16 @@ import {
   addFinance,
   updateFinance,
   precreatePayorder,
-  payZfb,
-} from "@/api/fin/finance";
+  payZfb
+} from '@/api/fin/finance'
 
 export default {
-  name: "Finance",
+  name: 'Finance',
   dicts: [
-    "dy_transport_type",
-    "dy_order_status",
-    "payment_status",
-    "fin_status",
+    'dy_transport_type',
+    'dy_order_status',
+    'payment_status',
+    'fin_status'
   ],
   data() {
     return {
@@ -502,7 +502,7 @@ export default {
       // 财务表表格数据
       financeList: [],
       // 弹出层标题
-      title: "",
+      title: '',
       // 是否显示弹出层
       open: false,
       // 查询参数
@@ -517,7 +517,7 @@ export default {
         totalAmount: null,
         cost: null,
         profit: null,
-        createTime: null,
+        createTime: null
       },
       // 表单参数
       form: {},
@@ -528,40 +528,40 @@ export default {
       openPay: false,
       paystatus: 1,
       payRows: null,
-      alipay: null,
-    };
+      alipay: null
+    }
   },
   watch: {
-    "queryParams.orderTimes": function (newOrderTimes) {
-      this.queryParams.orderStartTime = newOrderTimes[0] || "";
-      this.queryParams.orderEndTime = newOrderTimes[1] || "";
+    'queryParams.orderTimes': function (newOrderTimes) {
+      this.queryParams.orderStartTime = newOrderTimes[0] || ''
+      this.queryParams.orderEndTime = newOrderTimes[1] || ''
     },
-    "queryParams.boxTime": function (newBoxTime) {
-      this.queryParams.boxStartTime = newBoxTime[0] || "";
-      this.queryParams.boxEndTime = newBoxTime[1] || "";
-    },
+    'queryParams.boxTime': function (newBoxTime) {
+      this.queryParams.boxStartTime = newBoxTime[0] || ''
+      this.queryParams.boxEndTime = newBoxTime[1] || ''
+    }
   },
   created() {
-    this.getList();
-    this.roleKey = localStorage.getItem("roleKey");
+    this.getList()
+    this.roleKey = localStorage.getItem('roleKey')
   },
   methods: {
     /** 查询财务表列表 */
     getList() {
-      let a = JSON.parse(JSON.stringify(this.queryParams));
-      delete a.orderTimes;
-      delete a.boxTime;
-      this.loading = true;
+      let a = JSON.parse(JSON.stringify(this.queryParams))
+      delete a.orderTimes
+      delete a.boxTime
+      this.loading = true
       listFinance(a).then((response) => {
-        this.financeList = response.rows;
-        this.total = response.total;
-        this.loading = false;
-      });
+        this.financeList = response.rows
+        this.total = response.total
+        this.loading = false
+      })
     },
     // 取消按钮
     cancel() {
-      this.open = false;
-      this.reset();
+      this.open = false
+      this.reset()
     },
     // 表单重置
     reset() {
@@ -578,57 +578,57 @@ export default {
         qgCost: null,
         profit: null,
         createTime: null,
-        updateTime: null,
-      };
-      this.resetForm("form");
+        updateTime: null
+      }
+      this.resetForm('form')
     },
     /** 搜索按钮操作 */
     handleQuery() {
-      this.queryParams.pageNum = 1;
-      this.getList();
+      this.queryParams.pageNum = 1
+      this.getList()
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.resetForm("queryForm");
-      this.handleQuery();
+      this.resetForm('queryForm')
+      this.handleQuery()
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.id);
-      this.single = selection.length !== 1;
-      this.multiple = !selection.length;
+      this.ids = selection.map((item) => item.id)
+      this.single = selection.length !== 1
+      this.multiple = !selection.length
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加财务表";
+      this.reset()
+      this.open = true
+      this.title = '添加财务表'
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.reset();
-      const id = row.id || this.ids;
+      this.reset()
+      const id = row.id || this.ids
       getFinance(id).then((response) => {
-        this.form = response.data;
-        this.open = true;
-        this.title = "修改财务表";
-      });
+        this.form = response.data
+        this.open = true
+        this.title = '修改财务表'
+      })
     },
     // 支付按钮
     handlePay(row) {
       precreatePayorder({ financeId: row.id }).then((response) => {
-        this.payRows = response.data;
-        this.openPay = true;
-      });
+        this.payRows = response.data
+        this.openPay = true
+      })
     },
 
     openPayComfirm() {
       if (!this.payRows?.amount || this.payRows.amount <= 0) {
         this.$message({
-          message: "金额不能小于0",
-          type: "warning",
-        });
-        return;
+          message: '金额不能小于0',
+          type: 'warning'
+        })
+        return
       }
       //跳转
       if (this.paystatus === 0) {
@@ -636,70 +636,71 @@ export default {
       } else {
         //zfb
         payZfb(this.payRows.id).then((res) => {
-          console.log(res);
-          this.alipay = res;
-          console.log(this.$refs.alipayWap.children);
-          this.$refs.alipayWap.children[0].submit();
-        });
+          console.log(res)
+          this.alipay = res
+          this.$nextTick(() => {
+            this.$refs.alipayWap.children[0].submit()
+          })
+        })
       }
 
-      this.$confirm("是否完成支付?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          this.handleQuery();
-          this.openPay = false;
-        })
-        .catch(() => {
-          this.openPay = false;
-        });
+      // this.$confirm('是否完成支付?', '提示', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // })
+      //   .then(() => {
+      //     this.handleQuery()
+      //     this.openPay = false
+      //   })
+      //   .catch(() => {
+      //     this.openPay = false
+      //   })
     },
     /** 提交按钮 */
     submitForm() {
-      this.$refs["form"].validate((valid) => {
+      this.$refs['form'].validate((valid) => {
         if (valid) {
           if (this.form.id != null) {
             updateFinance(this.form).then((response) => {
-              this.$modal.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-            });
+              this.$modal.msgSuccess('修改成功')
+              this.open = false
+              this.getList()
+            })
           } else {
             addFinance(this.form).then((response) => {
-              this.$modal.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
-            });
+              this.$modal.msgSuccess('新增成功')
+              this.open = false
+              this.getList()
+            })
           }
         }
-      });
+      })
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const ids = row.id || this.ids;
+      const ids = row.id || this.ids
       this.$modal
         .confirm('是否确认删除财务表编号为"' + ids + '"的数据项？')
         .then(function () {
-          return delFinance(ids);
+          return delFinance(ids)
         })
         .then(() => {
-          this.getList();
-          this.$modal.msgSuccess("删除成功");
+          this.getList()
+          this.$modal.msgSuccess('删除成功')
         })
-        .catch(() => {});
+        .catch(() => {})
     },
     /** 导出按钮操作 */
     handleExport() {
       this.download(
-        "fin/finance/export",
+        'fin/finance/export',
         {
-          ...this.queryParams,
+          ...this.queryParams
         },
         `finance_${new Date().getTime()}.xlsx`
-      );
-    },
-  },
-};
+      )
+    }
+  }
+}
 </script>
