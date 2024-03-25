@@ -254,13 +254,6 @@
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-money"
-            @click="handlePay(scope.row)"
-            >支付</el-button
-          >
-          <el-button
-            size="mini"
-            type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['payorder:payorder:edit']"
@@ -369,28 +362,6 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
-
-    <!-- 支付对话框 -->
-    <el-dialog
-      :title="title"
-      :visible.sync="openPay"
-      width="500px"
-      append-to-body
-    >
-      <el-form label-width="80px">
-        <el-form-item label="支付方式" prop="status">
-          <el-select v-model="paystatus" placeholder="请选择支付状态">
-            <el-option label="微信支付" :value="0"></el-option>
-            <el-option label="支付宝支付" :value="1"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="openPayComfirm">确 定</el-button>
-        <el-button @click="openPay = false">取 消</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -401,8 +372,6 @@ import {
   delPayorder,
   addPayorder,
   updatePayorder,
-  precreatePayorder,
-  payZfb,
 } from "@/api/payorder/payorder";
 
 export default {
@@ -451,10 +420,6 @@ export default {
       form: {},
       // 表单校验
       rules: {},
-      //
-      openPay: false,
-      paystatus: 1,
-      payId: null,
     };
   },
   created() {
@@ -529,37 +494,6 @@ export default {
         this.open = true;
         this.title = "修改用户账单";
       });
-    },
-    // 支付按钮
-    handlePay(row) {
-      precreatePayorder(row.id).then((response) => {
-        this.payId = response.data.id;
-        this.openPay = true;
-      });
-    },
-    openPayComfirm() {
-      //跳转
-      if (this.paystatus == 0) {
-        //wx
-      } else {
-        //zfb
-        payZfb(this.payId).then((res) => {
-          //
-        });
-      }
-
-      this.$confirm("是否完成支付?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          this.handleQuery();
-          this.openPay = false;
-        })
-        .catch(() => {
-          this.openPay = false;
-        });
     },
     /** 提交按钮 */
     submitForm() {

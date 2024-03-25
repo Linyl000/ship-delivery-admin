@@ -42,18 +42,3 @@ export function delPayorder(id) {
     method: "delete",
   });
 }
-
-//订单预创建
-export function precreatePayorder(id) {
-  return request({
-    url: "/payorder/precreate/" + id,
-    method: "get",
-  });
-}
-//支付宝
-export function payZfb(id) {
-  return request({
-    url: "/aliPay/tradePreCreatePay/" + id,
-    method: "get",
-  });
-}
