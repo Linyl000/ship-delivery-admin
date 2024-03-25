@@ -10,7 +10,7 @@ export function listDt(query) {
 }
 
 // 查询订单明细列表
-export function listBoxDt(query) {
+export function listBoxDt(query) { 
   return request({
     url: '/dy/dt/box/list',
     method: 'get',

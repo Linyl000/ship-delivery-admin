@@ -27,7 +27,7 @@
       </el-form-item>
       <el-form-item label="三位货币代码" prop="currency">
         <el-input
-          v-model="queryParams.currency"
+          v-model="queryParams.currency" 
           placeholder="请输入三位货币代码"
           clearable
           @keyup.enter.native="handleQuery"

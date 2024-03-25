@@ -67,7 +67,7 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="订单ID" align="center" prop="orderId" />
       <el-table-column label="客户ID" align="center" prop="createBy" />
-      <el-table-column label="商品名称" align="center" prop="name" />
+      <el-table-column label="商品名称" align="center" prop="name" /> 
       <el-table-column label="数量" align="center" prop="number" />
       <el-table-column label="单件重量" align="center" prop="weight" />
       <el-table-column label="总重量" align="center" prop="totalWeight" />

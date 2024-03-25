@@ -10,7 +10,7 @@ export function listPayorder(query) {
 }
 
 // 查询用户账单详细
-export function getPayorder(id) {
+export function getPayorder(id) { 
   return request({
     url: '/payorder/' + id,
     method: 'get'
