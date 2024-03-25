@@ -6,60 +6,12 @@
       size="small"
       :inline="true"
       v-show="showSearch"
-      label-width="68px"
+      label-width="90px"
     >
-      <el-form-item label="货物名称" prop="name">
+      <el-form-item label="进仓号" prop="boxNum">
         <el-input
-          v-model="queryParams.name"
-          placeholder="请输入货物名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="数量" prop="number">
-        <el-input
-          v-model="queryParams.number"
-          placeholder="请输入数量"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="包装方式" prop="pakgeMethod">
-        <el-input
-          v-model="queryParams.pakgeMethod"
-          placeholder="请输入包装方式"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="重量单位 ：   克/g" prop="weight">
-        <el-input
-          v-model="queryParams.weight"
-          placeholder="请输入重量单位 ：   克/g"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="体积" prop="volume">
-        <el-input
-          v-model="queryParams.volume"
-          placeholder="请输入体积"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="单价" prop="unitPrice">
-        <el-input
-          v-model="queryParams.unitPrice"
-          placeholder="请输入单价"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="运费" prop="freight">
-        <el-input
-          v-model="queryParams.freight"
-          placeholder="请输入运费"
+          v-model="queryParams.boxNum"
+          placeholder="请输入进仓号"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -77,8 +29,7 @@
         >
       </el-form-item>
     </el-form>
-
-    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10" class="mb8" v-if="optType != 'view'">
       <el-col :span="1.5">
         <el-button
           type="primary"
@@ -88,18 +39,6 @@
           @click="handleAdd"
           v-hasPermi="['dy:dt:add']"
           >新增</el-button
-        >
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['dy:dt:edit']"
-          >修改</el-button
         >
       </el-col>
       <el-col :span="1.5">
@@ -114,17 +53,6 @@
           >删除</el-button
         >
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['dy:dt:export']"
-          >导出</el-button
-        >
-      </el-col>
       <right-toolbar
         :showSearch.sync="showSearch"
         @queryTable="getList"
@@ -137,17 +65,31 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="货物id" align="center" prop="id" />
-      <el-table-column label="货物名称" align="center" prop="name" />
+      <el-table-column label="订单ID" align="center" prop="orderId" />
+      <el-table-column label="客户ID" align="center" prop="createBy" />
+      <el-table-column label="商品名称" align="center" prop="name" />
       <el-table-column label="数量" align="center" prop="number" />
-      <el-table-column label="包装方式" align="center" prop="pakgeMethod" />
-      <el-table-column label="重量单位/kg" align="center" prop="weight" />
-      <el-table-column label="体积" align="center" prop="volume" />
+      <el-table-column label="单件重量" align="center" prop="weight" />
+      <el-table-column label="总重量" align="center" prop="totalWeight" />
+      <el-table-column label="装箱数" align="center" prop="boxNumber" />
+      <el-table-column label="总数" align="center" prop="totalNumber" />
       <el-table-column label="单价" align="center" prop="unitPrice" />
-      <el-table-column label="运费" align="center" prop="freight" />
-      <el-table-column label="送货费" align="center" prop="deliveryFee" />
-      <el-table-column label="物品价值" align="center" prop="itemValue" />
-      <el-table-column label="保险费" align="center" prop="premium" />
+      <el-table-column label="总货值" align="center" prop="totalValue" />
+      <el-table-column label="商品材料" align="center" prop="material" />
+      <el-table-column label="订单状态" align="center" prop="status">
+        <template slot-scope="scope">
+          <dict-tag
+            :options="dict.type.dy_order_status"
+            :value="scope.row.status"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="图片" align="center" prop="tpUrl" width="100">
+        <template slot-scope="scope">
+          <image-preview :src="scope.row.tpUrl" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
       <el-table-column
         label="操作"
         align="center"
@@ -185,42 +127,96 @@
     <!-- 添加或修改订单明细对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="订单id" prop="orderId">
-          <el-input v-model="form.orderId" placeholder="请输入订单id" />
-        </el-form-item>
-        <el-form-item label="货物名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入货物名称" />
-        </el-form-item>
-        <el-form-item label="数量" prop="number">
-          <el-input v-model="form.number" placeholder="请输入数量" />
-        </el-form-item>
-        <el-form-item label="包装方式" prop="pakgeMethod">
-          <el-input v-model="form.pakgeMethod" placeholder="请输入包装方式" />
-        </el-form-item>
-        <el-form-item label="重量单位 ：   克/g" prop="weight">
-          <el-input
-            v-model="form.weight"
-            placeholder="请输入重量单位 ：   克/g"
-          />
-        </el-form-item>
-        <el-form-item label="体积" prop="volume">
-          <el-input v-model="form.volume" placeholder="请输入体积" />
-        </el-form-item>
-        <el-form-item label="单价" prop="unitPrice">
-          <el-input v-model="form.unitPrice" placeholder="请输入单价" />
-        </el-form-item>
-        <el-form-item label="运费" prop="freight">
-          <el-input v-model="form.freight" placeholder="请输入运费" />
-        </el-form-item>
-        <el-form-item label="送货费" prop="deliveryFee">
-          <el-input v-model="form.deliveryFee" placeholder="请输入送货费" />
-        </el-form-item>
-        <el-form-item label="物品价值" prop="itemValue">
-          <el-input v-model="form.itemValue" placeholder="请输入物品价值" />
-        </el-form-item>
-        <el-form-item label="保险费" prop="premium">
-          <el-input v-model="form.premium" placeholder="请输入保险费" />
-        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="商品名称" prop="name">
+              <el-input
+                v-model="form.name"
+                placeholder="请输入商品名称"
+                maxlength="30"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="箱数" prop="number">
+              <el-input v-model="form.number" placeholder="请输入箱数" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="装箱数" prop="boxNumber">
+              <el-input v-model="form.boxNumber" placeholder="请输入装箱数" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="总数" prop="totalNumber">
+              <el-input v-model="form.totalNumber" placeholder="请输入总数" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="单件重量" prop="weight">
+              <el-input v-model="form.weight" placeholder="请输入单件重量" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="总重量" prop="totalWeight">
+              <el-input v-model="form.totalWeight" placeholder="请输入总重量" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="单价" prop="unitPrice">
+              <el-input v-model="form.unitPrice" placeholder="请输入单价" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="总货值" prop="totalValue">
+              <el-input v-model="form.totalValue" placeholder="请输入总货值" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="商品材料" prop="material">
+              <el-input v-model="form.material" placeholder="请输入商品材料" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item
+              label="商品状态"
+              prop="status"
+              v-if="roleKey == 'admin' || roleKey == 'admin1'"
+            >
+              <el-select
+                v-model="form.status"
+                placeholder="请选择商品状态"
+                clearable
+              >
+                <el-option
+                  v-for="dict in dict.type.dy_order_status"
+                  :key="dict.value"
+                  :label="dict.label"
+                  :value="dict.value"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="备注">
+              <el-input
+                v-model="form.remark"
+                type="textarea"
+                placeholder="请输入内容"
+              ></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -231,10 +227,11 @@
 </template>
 
 <script>
-import { listDt, getDt, delDt, addDt, updateDt } from '@/api/dy/dt'
+import { listBoxDt, getDt, delDt, addDt, updateDt } from '@/api/dy/dt'
 
 export default {
   name: 'Dt',
+  dicts: ['dy_pakge_method', 'dy_order_status'],
   data() {
     return {
       // 遮罩层
@@ -265,7 +262,9 @@ export default {
         weight: null,
         volume: null,
         unitPrice: null,
-        freight: null
+        freight: null,
+        boxNum:null,
+        orderId: null
       },
       // 表单参数
       form: {},
@@ -274,22 +273,60 @@ export default {
         name: [
           { required: true, message: '货物名称不能为空', trigger: 'blur' }
         ],
-        number: [{ required: true, message: '数量不能为空', trigger: 'blur' }]
-      }
+        number: [{ required: true, message: '数量不能为空', trigger: 'blur' }],
+        boxNumber: [
+          { required: true, message: '装箱数不能为空', trigger: 'blur' }
+        ],
+        totalNumber: [
+          { required: true, message: '总数不能为空', trigger: 'blur' }
+        ],
+        weight: [
+          { required: true, message: '单件重量不能为空', trigger: 'blur' }
+        ],
+        totalWeight: [
+          { required: true, message: '总重量不能为空', trigger: 'blur' }
+        ],
+        unitPrice: [
+          { required: true, message: '单价不能为空', trigger: 'blur' }
+        ],
+        totalValue: [
+          { required: true, message: '总货值不能为空', trigger: 'blur' }
+        ],
+        material: [
+          { required: true, message: '商品材料不能为空', trigger: 'blur' }
+        ]
+      },
+      roleKey: null
     }
+  },
+  props: {
+    optType: undefined,
+    orderId: undefined
   },
   created() {
     this.getList()
+    this.roleKey = localStorage.getItem('roleKey')
   },
   methods: {
     /** 查询订单明细列表 */
     getList() {
       this.loading = true
-      listDt(this.queryParams).then((response) => {
+      listBoxDt(this.queryParams).then((response) => {
         this.dtList = response.rows
         this.total = response.total
         this.loading = false
+        localStorage.setItem('len', this.total)
       })
+    },
+      /** 搜索按钮操作 */
+      handleQuery() {
+      this.queryParams.pageNum = 1;
+      this.getList();
+    },
+    /** 重置按钮操作 */
+    resetQuery() {
+      this.resetForm("queryForm");
+      this.handleQuery();
     },
     // 取消按钮
     cancel() {
@@ -314,19 +351,11 @@ export default {
         createBy: null,
         createTime: null,
         updateBy: null,
-        updateTime: null
+        updateTime: null,
+        status: null,
+        boxNum:null
       }
       this.resetForm('form')
-    },
-    /** 搜索按钮操作 */
-    handleQuery() {
-      this.queryParams.pageNum = 1
-      this.getList()
-    },
-    /** 重置按钮操作 */
-    resetQuery() {
-      this.resetForm('queryForm')
-      this.handleQuery()
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -338,7 +367,7 @@ export default {
     handleAdd() {
       this.reset()
       this.open = true
-      this.title = '添加订单明细'
+      this.title = '添加货物明细'
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -347,7 +376,7 @@ export default {
       getDt(id).then((response) => {
         this.form = response.data
         this.open = true
-        this.title = '修改订单明细'
+        this.title = '修改货物明细'
       })
     },
     /** 提交按钮 */
@@ -383,17 +412,9 @@ export default {
           this.$modal.msgSuccess('删除成功')
         })
         .catch(() => {})
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      this.download(
-        'dy/dt/export',
-        {
-          ...this.queryParams
-        },
-        `dt_${new Date().getTime()}.xlsx`
-      )
     }
   }
 }
 </script>
+
+<style></style>

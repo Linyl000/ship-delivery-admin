@@ -16,12 +16,12 @@ axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
   // baseURL: process.env.VUE_APP_BASE_API,
-  baseURL: 'https://delivery.wanhaiint.com',
-  // baseURL: 'http://localhost:8080',
+  // baseURL: 'https://delivery.wanhaiint.com',
+  baseURL: 'http://localhost:8080',
   // 超时
   timeout: 10000
 })
-service.ip = 'https://delivery.wanhaiint.com'
+service.ip = 'http://localhost:8080'
 // request拦截器
 service.interceptors.request.use(
   (config) => {
